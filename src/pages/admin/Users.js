@@ -1,13 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
-import { FiUsers, FiSearch, FiFilter, FiShield } from 'react-icons/fi';
+// import React, { useState, useEffect } from 'react';
+// import toast from 'react-hot-toast';
+// import { FiUsers, FiSearch, FiFilter, FiShield } from 'react-icons/fi';
+
+// const Users = () => {
+//   const [users, setUsers] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [filters, setFilters] = useState({
+//     search: '',
+//     role: 'all',
+//   });
+
+//   useEffect(() => {
+//     fetchUsers();
+//   }, [filters]);
+
+//   const fetchUsers = async () => {
+//     try {
+//       setLoading(true);
+//       setUsers([]); // placeholder
+//     } catch (error) {
+//       toast.error('Error loading users');
+//       console.error(error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const getRoleBadge = (role) => {
+//     const badges = {
+//       customer: 'bg-blue-100 text-blue-700',
+//       shop_manager: 'bg-purple-100 text-purple-700',
+//       admin: 'bg-red-100 text-red-700',
+//     };
+//     return badges[role] || 'bg-gray-100 text-gray-700';
+//   };
+
+//   if (loading && users.length === 0) {
+//     return (
+//       <div className="flex items-center justify-center min-h-screen">
+//         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600"></div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-6">
+//       <div className="flex items-center justify-between">
+//         <div>
+//           <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
+//           <p className="text-gray-600 mt-2">Manage all platform users</p>
+//         </div>
+//         <div className="text-right">
+//           <p className="text-2xl font-bold text-indigo-600">{users.length}</p>
+//           <p className="text-sm text-gray-600">Total Users</p>
+//         </div>
+//       </div>
+
+//       <div className="bg-white rounded-xl shadow-md p-6">
+//         <div className="flex items-center space-x-2 mb-4">
+//           <FiFilter className="text-gray-600" />
+//           <h2 className="text-lg font-semibold">Filters</h2>
+//         </div>
+
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//           <div>
+//             <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+//             <div className="relative">
+//               <FiSearch className="absolute left-3 top-3 text-gray-400" />
+//               <input
+//                 type="text"
+//                 placeholder="Search by name or email..."
+//                 value={filters.search}
+//                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+//                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
+//               />
+//             </div>
+//           </div>
+
+//           <div>
+//             <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+//             <select
+//               value={filters.role}
+//               onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+//               className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+//             >
+//               <option value="all">All Roles</option>
+//               <option value="customer">Customers</option>
+//               <option value="shop_manager">Shop Managers</option>
+//               <option value="admin">Admins</option>
+//             </select>
+//           </div>
+//         </div>
+//       </div>
+
+//       {users.length === 0 ? (
+//         <div className="bg-white rounded-xl shadow-md p-12 text-center">
+//           <FiUsers className="mx-auto text-6xl text-gray-400 mb-4" />
+//           <h3 className="text-2xl font-bold text-gray-900 mb-2">No users found</h3>
+//           <p className="text-gray-600">Users will appear here once they register</p>
+//         </div>
+//       ) : (
+//         <table className="w-full bg-white rounded-xl shadow-md">
+//           <tbody>
+//             {users.map((user) => (
+//               <tr key={user._id}>
+//                 <td>{user.name}</td>
+//                 <td>{user.email}</td>
+//                 <td>
+//                   <span className={`px-2 py-1 rounded ${getRoleBadge(user.role)}`}>
+//                     {user.role.replace('_', ' ')}
+//                   </span>
+//                 </td>
+//                 <td>{user.phone || 'N/A'}</td>
+//                 <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+//                 <td>
+//                   <span className={`px-2 py-1 rounded ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+//                     {user.isActive ? 'Active' : 'Inactive'}
+//                   </span>
+//                 </td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </table>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default Users;
+
+import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import { FiUsers, FiSearch, FiFilter } from "react-icons/fi";
+import { authService } from "../../services/api";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [filters, setFilters] = useState({
-    search: '',
-    role: 'all',
+    search: "",
+    role: "all",
   });
 
   useEffect(() => {
@@ -17,10 +150,20 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      setUsers([]); // placeholder
+
+      const params = {
+        search: filters.search,
+        role: filters.role === "all" ? "" : filters.role,
+      };
+
+      const res = await authService.getAllUsers(params);
+
+      console.log("Users API Response:", res.data);
+
+      setUsers(res.data?.data || []);
     } catch (error) {
-      toast.error('Error loading users');
-      console.error(error);
+      console.error("Users API error:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Error loading users");
     } finally {
       setLoading(false);
     }
@@ -28,14 +171,14 @@ const Users = () => {
 
   const getRoleBadge = (role) => {
     const badges = {
-      customer: 'bg-blue-100 text-blue-700',
-      shop_manager: 'bg-purple-100 text-purple-700',
-      admin: 'bg-red-100 text-red-700',
+      customer: "bg-blue-100 text-blue-700",
+      shop_manager: "bg-purple-100 text-purple-700",
+      admin: "bg-red-100 text-red-700",
     };
-    return badges[role] || 'bg-gray-100 text-gray-700';
+    return badges[role] || "bg-gray-100 text-gray-700";
   };
 
-  if (loading && users.length === 0) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600"></div>
@@ -47,75 +190,85 @@ const Users = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
-          <p className="text-gray-600 mt-2">Manage all platform users</p>
+          <h1 className="text-3xl font-bold">Users Management</h1>
+          <p className="text-gray-600">Manage all platform users</p>
         </div>
         <div className="text-right">
           <p className="text-2xl font-bold text-indigo-600">{users.length}</p>
-          <p className="text-sm text-gray-600">Total Users</p>
+          <p className="text-sm">Total Users</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-6">
+      {/* Filters */}
+      <div className="bg-white p-6 rounded-xl shadow">
         <div className="flex items-center space-x-2 mb-4">
-          <FiFilter className="text-gray-600" />
-          <h2 className="text-lg font-semibold">Filters</h2>
+          <FiFilter />
+          <h2 className="font-semibold">Filters</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by name or email..."
-                value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
-              />
-            </div>
-          </div>
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            type="text"
+            placeholder="Search name/email"
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            className="border p-2 rounded"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-            <select
-              value={filters.role}
-              onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            >
-              <option value="all">All Roles</option>
-              <option value="customer">Customers</option>
-              <option value="shop_manager">Shop Managers</option>
-              <option value="admin">Admins</option>
-            </select>
-          </div>
+          <select
+            value={filters.role}
+            onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+            className="border p-2 rounded"
+          >
+            <option value="all">All</option>
+            <option value="customer">Customer</option>
+            <option value="shop_manager">Shop Manager</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
       </div>
 
+      {/* Table */}
       {users.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-md p-12 text-center">
-          <FiUsers className="mx-auto text-6xl text-gray-400 mb-4" />
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">No users found</h3>
-          <p className="text-gray-600">Users will appear here once they register</p>
+        <div className="bg-white p-10 text-center rounded-xl shadow">
+          <FiUsers className="mx-auto text-5xl text-gray-400" />
+          <p className="mt-4">No users found</p>
         </div>
       ) : (
-        <table className="w-full bg-white rounded-xl shadow-md">
+        <table className="w-full bg-white rounded-xl shadow">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3">Name</th>
+              <th className="p-3">Email</th>
+              <th className="p-3">Role</th>
+              <th className="p-3">Phone</th>
+              <th className="p-3">Joined</th>
+              <th className="p-3">Status</th>
+            </tr>
+          </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>
-                  <span className={`px-2 py-1 rounded ${getRoleBadge(user.role)}`}>
-                    {user.role.replace('_', ' ')}
+            {users.map((u) => (
+              <tr key={u._id} className="border-t">
+                <td className="p-3">{u.name}</td>
+                <td className="p-3">{u.email}</td>
+                <td className="p-3">
+                  <span className={`px-2 py-1 rounded ${getRoleBadge(u.role)}`}>
+                    {u.role.replace("_", " ")}
                   </span>
                 </td>
-                <td>{user.phone || 'N/A'}</td>
-                <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                <td>
-                  <span className={`px-2 py-1 rounded ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {user.isActive ? 'Active' : 'Inactive'}
+                <td className="p-3">{u.phone || "N/A"}</td>
+                <td className="p-3">
+                  {new Date(u.createdAt).toLocaleDateString()}
+                </td>
+                <td className="p-3">
+                  <span
+                    className={`px-2 py-1 rounded ${
+                      u.isActive
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {u.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>
               </tr>

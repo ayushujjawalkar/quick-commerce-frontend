@@ -50,6 +50,8 @@ export const authService = {
   addAddress: (data) => api.post('/auth/addresses', data),
   updateAddress: (addressId, data) => api.put(`/auth/addresses/${addressId}`, data),
   deleteAddress: (addressId) => api.delete(`/auth/addresses/${addressId}`),
+  getAllUsers: (params) => api.get("/admin/users", { params }),
+
 
 };
 
@@ -99,6 +101,7 @@ export const orderService = {
   getShopOrders: (shopId, params) => api.get(`/orders/shop/${shopId}`, { params }),
   updateOrderStatus: (orderId, data) => api.patch(`/orders/${orderId}/status`, data),
   cancelOrder: (orderId, reason) => api.patch(`/orders/${orderId}/cancel`, { reason }),
+   getAllOrders: (params) => api.get('/orders/admin/all', { params }),
 };
 
 export default api;
