@@ -1,38 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-
-// const Home = () => {
-//   const [shops, setShops] = useState([]);
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     setShops([]);
-//   }, []);
-
-//   return (
-//     <div className="p-8">
-//       <h1 className="text-3xl font-bold mb-6">Nearby Shops</h1>
-//       <div className="grid grid-cols-3 gap-6">
-//         {shops.map((shop) => (
-//           <div
-//             key={shop._id}
-//             onClick={() => navigate(`/shop/${shop._id}`)}
-//             className="bg-white p-6 shadow rounded cursor-pointer"
-//           >
-//             {shop.name}
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Home;
-
-
-
-
-
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

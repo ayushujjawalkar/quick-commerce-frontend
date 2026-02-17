@@ -1,3 +1,6 @@
+
+
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -13,6 +16,7 @@ import AuthLayout from './components/layouts/AuthLayout';
 // Auth Pages
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
+import DeliveryPartnerSignup from './pages/auth/DeliveryPartnerSignup'; // ✅ KEEP THIS ONE
 
 // Customer Pages
 import Home from './pages/customer/Home';
@@ -22,6 +26,7 @@ import Cart from './pages/customer/Cart';
 import Checkout from './pages/customer/Checkout';
 import Orders from './pages/customer/Orders';
 import OrderDetails from './pages/customer/OrderDetails';
+import LiveOrderTracking from './pages/customer/LiveOrderTracking';
 import Profile from './pages/customer/Profile';
 import AddAddress from "./pages/customer/AddAddress";
 
@@ -38,6 +43,11 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AllShops from './pages/admin/AllShops';
 import AllOrders from './pages/admin/AllOrders';
 import Users from './pages/admin/Users';
+import DeliveryPartners from './pages/admin/DeliveryPartners';
+
+// Delivery Pages
+import DeliveryPartnerDashboard from './pages/delivery/Dashboard';
+// ❌ DELETE LINE 271 - DeliveryPartnerSignup already imported above!
 
 // Protected Route Component
 import ProtectedRoute from './components/ProtectedRoute';
@@ -81,77 +91,29 @@ function App() {
               <Route path="/signup" element={<Signup />} />
             </Route>
 
+            {/* ✅ Delivery Partner Signup (Public Route - Outside AuthLayout) */}
+            <Route path="/delivery-signup" element={<DeliveryPartnerSignup />} />
+
             {/* Customer Routes */}
             <Route element={<CustomerLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/shop/:shopId" element={<ShopDetails />} />
               <Route path="/product/:productId" element={<ProductDetails />} />
-              <Route 
-                path="/cart" 
-                element={
-                  <ProtectedRoute>
-                    <Cart />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/checkout" 
-                element={
-                  <ProtectedRoute>
-                    <Checkout />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/orders" 
-                element={
-                  <ProtectedRoute>
-                    <Orders />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/orders/:orderId" 
-                element={
-                  <ProtectedRoute>
-                    <OrderDetails />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/profile" 
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                } 
-              />
+              
+              <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+              <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+              <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+              <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
+              <Route path="/track/:orderId" element={<ProtectedRoute><LiveOrderTracking /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             </Route>
 
-           <Route
-               path="/profile/addresses" 
-             element={
-             <AddAddress />
-             }
-              />
-
-            <Route
-             path="/edit-address/:addressId" 
-             element={
-             <AddAddress />
-             }
-              />
-
+            {/* Address Routes */}
+            <Route path="/profile/addresses" element={<ProtectedRoute><AddAddress /></ProtectedRoute>} />
+            <Route path="/edit-address/:addressId" element={<ProtectedRoute><AddAddress /></ProtectedRoute>} />
 
             {/* Manager Routes */}
-            <Route 
-              path="/manager" 
-              element={
-                <ProtectedRoute requiredRole="shop_manager">
-                  <ManagerLayout />
-                </ProtectedRoute>
-              }
-            >
+            <Route path="/manager" element={<ProtectedRoute requiredRole="shop_manager"><ManagerLayout /></ProtectedRoute>}>
               <Route index element={<ManagerDashboard />} />
               <Route path="shops" element={<MyShops />} />
               <Route path="shops/new" element={<ShopForm />} />
@@ -163,19 +125,16 @@ function App() {
             </Route>
 
             {/* Admin Routes */}
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
+            <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />
               <Route path="shops" element={<AllShops />} />
               <Route path="orders" element={<AllOrders />} />
               <Route path="users" element={<Users />} />
+              <Route path="delivery-partners" element={<DeliveryPartners />} />
             </Route>
+
+            {/* Delivery Partner Routes */}
+            <Route path="/delivery" element={<ProtectedRoute requiredRole="delivery_partner"><DeliveryPartnerDashboard /></ProtectedRoute>} />
 
             {/* 404 */}
             <Route path="*" element={<Navigate to="/" replace />} />
